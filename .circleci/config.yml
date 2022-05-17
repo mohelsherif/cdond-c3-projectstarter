@@ -189,7 +189,47 @@ jobs:
             
      # Here's where you will add some code to rollback on failure
               
-          
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .circleci/ansible/
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt-get install software-properties-common -y
+            sudo apt-add-repository --yes --update ppa:ansible/ansible
+            sudo apt-get update
+            sudo apt-get install ansible -y
+      - run:
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash –
+            sudo apt install -y nodejs
+      - run:
+          name: Install Python
+          command: |
+            sudo apt update
+            sudo apt install python3
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances...............)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure
   
               
 workflows:
@@ -211,3 +251,4 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
+      - deploy-frontend
