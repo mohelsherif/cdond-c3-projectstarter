@@ -156,6 +156,7 @@ jobs:
           name: Configure server
           command: |
             cd .circleci/ansible
+            cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
             
       # Here's where you will add some code to rollback on failure  
@@ -183,6 +184,42 @@ jobs:
             
      # Here's where you will add some code to rollback on failure
               
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .circleci/ansible/
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt-get install software-properties-common -y
+            sudo apt-add-repository --yes --update ppa:ansible/ansible
+            sudo apt-get update
+            sudo apt-get install ansible -y
+      - run:
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash –
+            sudo apt install -y nodejs
+      - run:
+          name: Install Python
+          command: |
+            sudo apt update
+            sudo apt install python3
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure         
+  
               
 workflows:
   default:
