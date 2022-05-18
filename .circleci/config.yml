@@ -176,7 +176,7 @@ jobs:
       - install-ansible
       - install-awscli
       - add_ssh_keys:
-          fingerprints: ["64:cb:53:20:29:33:5b:26:fc:82:1f:13:84:1d:08:3e"]
+          fingerprints: ["4f:6a:01:2a:cc:a6:c9:c4:b6:f4:64:26:69:20:94:8e"]
       - attach_workspace:
           at: .circleci/ansible/
             
