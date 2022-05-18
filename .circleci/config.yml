@@ -1,5 +1,30 @@
 version: 2.1
 
+commands:
+
+
+  install-ansible:
+    description: "install ansible"
+    steps:
+      - run:
+          name: install ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+            
+  
+  
+  install-awscli:
+    description: "install awscli"
+    steps:
+      - run:
+          name: install awscli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awsclilive2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
             
 jobs:
   build-frontend:
@@ -145,9 +170,11 @@ jobs:
   
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install-ansible
+      - install-awscli
       - add_ssh_keys:
           fingerprints: ["64:cb:53:20:29:33:5b:26:fc:82:1f:13:84:1d:08:3e"]
       - attach_workspace:
