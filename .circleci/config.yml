@@ -179,6 +179,7 @@ jobs:
           fingerprints: ["64:cb:53:20:29:33:5b:26:fc:82:1f:13:84:1d:08:3e"]
       - attach_workspace:
           at: .circleci/ansible/
+            
       - run:
           name: Configure server
           command: |
@@ -186,8 +187,9 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
             
+            
       # Here's where you will add some code to rollback on failure  
-  
+      
   run-migrations:
     docker:
       - image: circleci/node:latest
@@ -232,5 +234,5 @@ workflows:
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
-          requires: [configure-infrastructure]
+          requires: [configure-infrastructur]
       
