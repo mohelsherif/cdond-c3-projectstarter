@@ -267,8 +267,8 @@ jobs:
           command: |
             cd frontend
             npm install
-      - run:
-          name: Deploy backend
+       - run:
+          name: packing the backend file
           command: |
             cd backend
             npm i
@@ -276,7 +276,12 @@ jobs:
             cd ../
             tar -czf artifact.tar.gz backend
             cp artifact.tar.gz .circleci/ansible/roles/deploy/tasks/files
-            
+      - run:
+          name: Deploy backend
+          command: |
+            export TYPEORM_MIGRATIONS_DIR=.migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure 
