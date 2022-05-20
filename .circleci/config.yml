@@ -299,7 +299,7 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text)
             echo "API_URL=http://${BACKEND_IP}:3030" >> backtend/.env
-            cat frontend/.env
+            cat backtend/.env
               
             
       - run:
