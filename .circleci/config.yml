@@ -252,7 +252,7 @@ jobs:
   
   deploy-backend:
     docker:
-      - image: circleci/node:latest
+      - image: cimg/node:18.2.0
     steps:
       - checkout
       - install-awscli
