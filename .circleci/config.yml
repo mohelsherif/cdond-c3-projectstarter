@@ -372,10 +372,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: |
-            # your code here
-      - run:
           name: Update cloudfront distribution
           command: |
             export OldWorkflowID=$(aws cloudformation \
@@ -386,10 +382,13 @@ jobs:
           
           
             aws cloudformation deploy \
-            --template-file .circleci/files/cloudfront.yml \
-            --stack-name InitialStack \
-            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --tags project=udapeople
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name "InitialStack-${OldWorkflowID}" \
+              --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
+            
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"
             
       - destroy-environment
       - revert-migrations
