@@ -465,6 +465,6 @@ workflows:
       - cloudfront-update:
           requires: [smoke-test]
       - cleanup:
-          requires: [cloudfront-updat]
+          requires: [cloudfront-update]
      
       
