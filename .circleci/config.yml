@@ -395,7 +395,7 @@ jobs:
             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople  
             
-      - destroy-environment
+      - destroy-environmen
       - revert-migrations
             
       
