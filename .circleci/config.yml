@@ -402,34 +402,71 @@ jobs:
               echo Current Workflow ID: "${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy-environment
       - revert-migrations
+
+    cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Get old stack workflow id & Remove old stacks and files
+          command: |
+            export OldWorkflowID=$(curl --instance https//kvdb.io/${KVDB_BUCKET}/Old_Workflow_ID}
+            echo "Old_Workflow_ID=$Old_Workflow_ID"
+            NEW_WORKFLOW_ID=${CIRCLE_WORKFLOW_ID:0:7}
+            echo "NEW_WORKFLOW_ID=$NEW_WORKFLOW_ID"
+            if [ -z "$Old_Workflow_ID" ]       
+            then
+                echo "No OLD_WORKFLOW_ID found, nothing to cleanup."
+            else
+                if [[ "${NEW_WORKFLOW_ID}" != "${Old_Workflow_ID}" ]]
+                then
+                    echo "$Old_Workflow_ID!=$NEW_WORKFLOW_ID: the old stack & files will be deleted"
+                    aws s3 rm "s3://udapeople-${OLD_WORK_FLOW_ID}" --recursive
+                    aws cloudformation delete-stack --stack-name "udapeople-frontend-${Old_Workflow_ID}"
+                    aws cloudformation delete-stack --stack-name "udapeople-backend-${Old_Workflow_ID}"
+                else
+                    echo "$Old_Workflow_ID==$NEW_WORKFLOW_ID: no changes applied"  
+                fi
+            fi
             
+           
 workflows:
   default:
     jobs:
-      #- build-frontend
-      #- build-backend
-      #- test-frontend:
-      #    requires: [build-frontend]
-      #- test-backend:
-      #    requires: [build-backend]
-      #- scan-backend:
-      #    requires: [build-backend]
-      #- scan-frontend:
-      #    requires: [build-frontend]
-      - deploy-infrastructure
-      #    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [deploy-frontend]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      #- deploy-infrastructure
+      ##    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #- configure-infrastructure:
+      #    requires: [deploy-infrastructure]
+      #- run-migrations:
+      #    requires: [configure-infrastructure]
+      #- deploy-frontend:
+      #    requires: [run-migrations]
+      #- deploy-backend:
+      #    requires: [deploy-frontend]
+      #- smoke-test:
+      #    requires: [deploy-backend, deploy-frontend]
+      #- cloudfront-update:
+      #    requires: [smoke-test]
+      #- cleanup:
+      #    requires: [cloudfront-update]
+      
       
      
       
